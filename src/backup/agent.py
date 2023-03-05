@@ -1,31 +1,85 @@
 from mesa import Agent
-
 import math
+
+ATTACK_DAMAGE = 50
+INITIAL_HEALTH = 100
+HEALING_POTION = 20
+
+
+def set_agent_type_settings(agent, type):
+    if type == 1:
+        agent.health = 2 * INITIAL_HEALTH
+        agent.attack_damage = 2 * ATTACK_DAMAGE
+    if type == 2:
+        agent.health = math.ceil(INITIAL_HEALTH / 2)
+        agent.attack_damage = math.ceil(ATTACK_DAMAGE / 2)
+    if type == 3:
+        agent.health = math.ceil(INITIAL_HEALTH / 4)
+        agent.attack_damage = ATTACK_DAMAGE * 4
 
 
 class MoneyAgent(Agent):
-    """An agent with fixed initial wealth."""
+    """An agent that fights."""
 
-    def __init__(self, unique_id, model):
+    def __init__(self, unique_id, model, type):
         super().__init__(unique_id, model)
-        self.wealth = 10
+        self.type = type
+        self.health = INITIAL_HEALTH
+        self.attack_damage = ATTACK_DAMAGE
+        self.attacked = False
+        self.dead = False
+        self.dead_count = 0
+        self.buried = False
+        set_agent_type_settings(self, type)
+
+    def __repr__(self) -> str:
+        return f"{self.unique_id} -> {self.health}"
 
     def step(self) -> None:
-        self.move()
-        if self.wealth > 0:
-            self.give_money()
+        # buried agents do not move (Do they???? :))
+        if self.buried:
+            return
 
-    def give_money(self):
-        cellmates = self.model.grid.get_cell_list_contents([self.pos])
-        if len(cellmates) > 1:
-            other = self.random.choice(cellmates)
-            money = math.ceil(0.8 * self.wealth)
-            other.wealth += money
-            self.wealth -= money
+        # dead for too long it is buried not being displayed
+        if self.dead_count > 4:
+            self.buried = True
+            return
+
+        # no health and not buried increment the count
+        if self.health <= 0 and not self.buried:
+            self.dead = True
+            self.dead_count += 1
+            return
+
+        # when attacked needs one turn until be able to attack
+        if self.attacked:
+            self.attacked = False
+            return
+
+        self.move()
+
+    def attackOrMove(self, cells_with_agents) -> None:
+        agentToAttack = self.random.choice(cells_with_agents)
+        agentToAttack.health -= ATTACK_DAMAGE
+        agentToAttack.attacked = True
 
     def move(self) -> None:
         possible_steps = self.model.grid.get_neighborhood(
             self.pos, moore=True, include_center=False
         )
-        new_position = self.random.choice(possible_steps)
-        self.model.grid.move_agent(self, new_position)
+
+        cells_with_agents = []
+        # looking for agents in the cells around the agent
+        for cell in possible_steps:
+            otherAgents = self.model.grid.get_cell_list_contents([cell])
+            if len(otherAgents):
+                for agent in otherAgents:
+                    if not agent.dead:
+                        cells_with_agents.append(agent)
+
+        # if there is some agent on the
+        if len(cells_with_agents):
+            self.attackOrMove(cells_with_agents)
+        else:
+            new_position = self.random.choice(possible_steps)
+            self.model.grid.move_agent(self, new_position)
