@@ -86,7 +86,7 @@ class FightingAgent(Agent):
         self.model.grid.move_agent(self, new_position)
 
     def attack(self, cells_with_agents) -> None:
-        """Handles the attack of the agent. 
+        """Handles the attack of the agent.
         Gets the list of cells with the agents the agent can attack.
 
         Args:
