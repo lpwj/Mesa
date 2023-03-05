@@ -1,7 +1,7 @@
 from mesa import Agent
 
 
-class MoneyAgent(Agent):
+class FightingAgent(Agent):
     """An agent with fixed initial wealth."""
 
     def __init__(self, unique_id, model):

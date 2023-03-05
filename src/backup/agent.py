@@ -3,9 +3,9 @@ import math
 
 ATTACK_DAMAGE = 50
 INITIAL_HEALTH = 100
-HEALING_POTION = 2
+HEALING_POTION = 20
 
-STRATEGY = 1
+STRATEGY = 0
 
 
 def set_agent_type_settings(agent, type):
@@ -20,7 +20,7 @@ def set_agent_type_settings(agent, type):
         agent.attack_damage = ATTACK_DAMAGE * 4
 
 
-class MoneyAgent(Agent):
+class FightingAgent(Agent):
     """An agent that fights."""
 
     def __init__(self, unique_id, model, type):
@@ -48,8 +48,7 @@ class MoneyAgent(Agent):
             return
 
         # no health and not buried increment the count
-        if self.health <= 0 and not self.buried:
-            self.dead = True
+        if self.dead and not self.buried:
             self.dead_count += 1
             return
 
@@ -74,11 +73,21 @@ class MoneyAgent(Agent):
     def attack(self, cells_with_agents) -> None:
 
         agentToAttack = self.random.choice(cells_with_agents)
-        agentToAttack.health -= ATTACK_DAMAGE
+        agentToAttack.health -= self.attack_damage
         agentToAttack.attacked = True
+        if agentToAttack.health <= 0:
+            agentToAttack.dead = True
         print("I attacked!")
 
     def move(self) -> None:
+        """Handles the movement behavior. Here the agent decides if it moves or attacks other agent."""
+
+        should_take_potion = self.random.randint(0, 100)
+        if should_take_potion == 1:
+            self.health += HEALING_POTION
+            print("Drinking my potion!")
+            return
+
         possible_steps = self.model.grid.get_neighborhood(
             self.pos, moore=True, include_center=False
         )

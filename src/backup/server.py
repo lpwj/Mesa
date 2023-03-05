@@ -1,10 +1,10 @@
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.UserParam import NumberInput
 
-from model import MoneyModel
+from model import FightingModel
 from mesa.visualization.modules import CanvasGrid, ChartModule
 
-NUMBER_OF_CELLS = 20
+NUMBER_OF_CELLS = 10
 SIZE_OF_CANVAS_IN_PIXELS_X = 1400
 SIZE_OF_CANVAS_IN_PIXELS_Y = 1100
 
@@ -34,18 +34,20 @@ def agent_portrayal(agent):
         "Shape": "circle",
         "Filled": "true",
         "r": 0.5,
-        "text": f"ID:{agent.unique_id} Type: {agent.type}",
+        "text": f"{agent.health} Type: {agent.type}",
         "text_color": "black",
     }
 
-    if agent.health > 50:
-        portrayal["Color"] = "green"
+    if agent.dead:
+        portrayal["Shape"] = "rect"
+        portrayal["w"] = 0.2
+        portrayal["h"] = 0.2
+        portrayal["Color"] = "black"
         portrayal["Layer"] = 1
 
-    else:
-        portrayal["Color"] = "red"
-        portrayal["Layer"] = 2
-        portrayal["r"] = 0.2
+        print("dead")
+
+        return portrayal
 
     if agent.type == 0:
         portrayal["r"] = 0.2
@@ -59,12 +61,13 @@ def agent_portrayal(agent):
     elif agent.type == 3:
         portrayal["r"] = 0.9
 
-    if agent.dead:
-        portrayal["Shape"] = "rect"
-        portrayal["w"] = 0.2
-        portrayal["h"] = 0.2
-        portrayal["Color"] = "black"
+    if agent.health > 50:
+        portrayal["Color"] = "green"
         portrayal["Layer"] = 1
+
+    else:
+        portrayal["Color"] = "red"
+        portrayal["Layer"] = 2
 
     return portrayal
 
@@ -88,7 +91,7 @@ chart_healthy = ChartModule(
 
 
 server = ModularServer(
-    MoneyModel,
+    FightingModel,
     [grid, chart_healthy],
     "Money Model",
     simulation_params,

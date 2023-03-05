@@ -1,7 +1,7 @@
 from mesa.visualization.ModularVisualization import ModularServer
 from mesa.visualization.UserParam import UserSettableParameter
 
-from model import MoneyModel
+from model import FightingModel
 from mesa.visualization.modules import CanvasGrid, ChartModule
 
 NUMBER_OF_CELLS = 10
@@ -56,7 +56,7 @@ chart_currents = ChartModule(
 
 
 server = ModularServer(
-    MoneyModel, [grid, chart_currents], "Money Model", simulation_params
+    FightingModel, [grid, chart_currents], "Money Model", simulation_params
 )
 server.port = 8521  # The default
 server.launch()

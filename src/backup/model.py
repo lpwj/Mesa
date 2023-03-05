@@ -1,11 +1,11 @@
 from mesa import Model
-from agent import MoneyAgent
+from agent import FightingAgent
 from mesa.time import RandomActivation
 from mesa.space import MultiGrid
 from mesa.datacollection import DataCollector
 
 
-class MoneyModel(Model):
+class FightingModel(Model):
     """A model with some number of agents."""
 
     def __init__(self, number_agents: int, width: int, height: int):
@@ -18,14 +18,14 @@ class MoneyModel(Model):
 
         self.datacollector_currents = DataCollector(
             {
-                "Healthy Agents": MoneyModel.current_healthy_agents,
-                "Non Healthy Agents": MoneyModel.current_non_healthy_agents,
+                "Healthy Agents": FightingModel.current_healthy_agents,
+                "Non Healthy Agents": FightingModel.current_non_healthy_agents,
             }
         )
 
         # Create agents
         for i in range(self.num_agents):
-            a = MoneyAgent(i, self, self.random.randrange(4))
+            a = FightingAgent(i, self, self.random.randrange(4))
             self.schedule.add(a)
 
             # Add the agent to a random grid cell
@@ -38,7 +38,7 @@ class MoneyModel(Model):
         self.schedule.step()
         self.datacollector_currents.collect(self)  # passing the model
 
-        if MoneyModel.current_healthy_agents(self) == 1:
+        if FightingModel.current_healthy_agents(self) == 1:
             self.running = False
 
     @staticmethod
@@ -64,3 +64,5 @@ class MoneyModel(Model):
             (Integer): Number of Agents.
         """
         return sum([1 for agent in model.schedule.agents if agent.health == 0])
+
+   
