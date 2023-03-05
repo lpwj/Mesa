@@ -1,23 +1,17 @@
 from mesa.visualization.ModularVisualization import ModularServer
-from mesa.visualization.UserParam import UserSettableParameter
+from mesa.visualization.UserParam import NumberInput
 
 from model import FightingModel
 from mesa.visualization.modules import CanvasGrid, ChartModule
 
-NUMBER_OF_CELLS = 10
+NUMBER_OF_CELLS = 20
 
-SIZE_OF_CANVAS_IN_PIXELS_X = 500
-SIZE_OF_CANVAS_IN_PIXELS_Y = 500
+SIZE_OF_CANVAS_IN_PIXELS_X = 1400
+SIZE_OF_CANVAS_IN_PIXELS_Y = 1100
 
 simulation_params = {
-    "number_of_agents": UserSettableParameter(
-        "slider",
-        "Number of Agents",
-        50,  # default
-        10,  # min
-        200,  # max
-        1,  # step
-        description="Choose how many agents to include in the simulation",
+    "number_agents": NumberInput(
+        "Choose how many agents to include in the model", value=NUMBER_OF_CELLS
     ),
     "width": NUMBER_OF_CELLS,
     "height": NUMBER_OF_CELLS,
@@ -25,15 +19,60 @@ simulation_params = {
 
 
 def agent_portrayal(agent):
-    portrayal = {"Shape": "circle", "Filled": "true", "r": 0.5}
+    # if the agent is buried we put it as white, not showing it.
+    if agent.buried:
+        portrayal = {
+            "Shape": "circle",
+            "Filled": "true",
+            "Color": "white",
+            "r": 0.01,
+            "text": "",
+            "Layer": 0,
+            "text_color": "black",
+        }
+        return portrayal
 
-    if agent.wealth > 0:
+    # the default config is a circle
+    portrayal = {
+        "Shape": "circle",
+        "Filled": "true",
+        "r": 0.5,
+        "text": f"{agent.health} Type: {agent.type}",
+        "text_color": "black",
+    }
+
+    # if the agent is dead on the floor we change it to a black rect
+    if agent.dead:
+        portrayal["Shape"] = "rect"
+        portrayal["w"] = 0.2
+        portrayal["h"] = 0.2
+        portrayal["Color"] = "black"
+        portrayal["Layer"] = 1
+
+        return portrayal
+
+    # if the agent is alive we set its radius according to the its type
+    if agent.type == 0:
+        portrayal["r"] = 0.2
+
+    elif agent.type == 1:
+        portrayal["r"] = 0.4
+
+    elif agent.type == 2:
+        portrayal["r"] = 0.6
+
+    elif agent.type == 3:
+        portrayal["r"] = 0.9
+
+    # according to the level o health of the agent we change the color of it
+    if agent.health > 50:
         portrayal["Color"] = "green"
-        portrayal["Layer"] = 0
+        portrayal["Layer"] = 1
+
     else:
         portrayal["Color"] = "red"
-        portrayal["Layer"] = 1
-        portrayal["r"] = 0.2
+        portrayal["Layer"] = 2
+
     return portrayal
 
 
@@ -47,8 +86,8 @@ grid = CanvasGrid(
 
 chart_currents = ChartModule(
     [
-        {"Label": "Wealthy Agents", "Color": "green"},
-        {"Label": "Non Wealthy Agents", "Color": "red"},
+        {"Label": "Healthy Agents", "Color": "green"},
+        {"Label": "Non Healthy Agents", "Color": "red"},
     ],
     canvas_height=300,
     data_collector_name="datacollector_currents",

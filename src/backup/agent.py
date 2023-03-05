@@ -124,7 +124,7 @@ class FightingAgent(Agent):
                     if not agent.dead:
                         cells_with_agents.append(agent)
 
-        # if there is some agent on the
+        # if there is some agent on the neighborhood
         if len(cells_with_agents):
             if STRATEGY == 1:
                 self.attackOrMove(cells_with_agents, possible_steps)

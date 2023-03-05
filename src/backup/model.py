@@ -38,6 +38,7 @@ class FightingModel(Model):
         self.schedule.step()
         self.datacollector_currents.collect(self)  # passing the model
 
+        # Checking if there is a champion
         if FightingModel.current_healthy_agents(self) == 1:
             self.running = False
 
