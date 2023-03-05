@@ -18,6 +18,7 @@ simulation_params = {
 
 
 def agent_portrayal(agent):
+    # if the agent is buried we put it as white, not showing it.
     if agent.buried:
         portrayal = {
             "Shape": "circle",
@@ -30,6 +31,7 @@ def agent_portrayal(agent):
         }
         return portrayal
 
+    # the default config is a circle
     portrayal = {
         "Shape": "circle",
         "Filled": "true",
@@ -38,6 +40,7 @@ def agent_portrayal(agent):
         "text_color": "black",
     }
 
+    # if the agent is dead on the floor we change it to a black rect
     if agent.dead:
         portrayal["Shape"] = "rect"
         portrayal["w"] = 0.2
@@ -45,10 +48,9 @@ def agent_portrayal(agent):
         portrayal["Color"] = "black"
         portrayal["Layer"] = 1
 
-        print("dead")
-
         return portrayal
 
+    # if the agent is alive we set its radius according to the its type
     if agent.type == 0:
         portrayal["r"] = 0.2
 
@@ -61,6 +63,7 @@ def agent_portrayal(agent):
     elif agent.type == 3:
         portrayal["r"] = 0.9
 
+    # according to the level o health of the agent we change the color of it
     if agent.health > 50:
         portrayal["Color"] = "green"
         portrayal["Layer"] = 1

@@ -9,6 +9,12 @@ STRATEGY = 0
 
 
 def set_agent_type_settings(agent, type):
+    """Updates the agent's instance variables according to its type.
+
+    Args:
+        agent (FightingAgent): The agent instance.
+        type (int): The type of the agent.
+    """
     if type == 1:
         agent.health = 2 * INITIAL_HEALTH
         agent.attack_damage = 2 * ATTACK_DAMAGE
@@ -38,6 +44,9 @@ class FightingAgent(Agent):
         return f"{self.unique_id} -> {self.health}"
 
     def step(self) -> None:
+        """Handles the step of the model dor each agent.
+        Sets the flags of each agent during the simulation.
+        """
         # buried agents do not move (Do they???? :))
         if self.buried:
             return
@@ -60,7 +69,13 @@ class FightingAgent(Agent):
         self.move()
 
     def attackOrMove(self, cells_with_agents, possible_steps) -> None:
+        """Decides if the user is going to attack or just move.
+        Acts randomly.
 
+        Args:
+            cells_with_agents (list[FightingAgent]): The list of other agents nearby.
+            possible_steps (list[Coordinates]): The list of available cell where to go.
+        """
         should_attack = self.random.randint(0, 1)
         if should_attack:
             self.attack(cells_with_agents)
@@ -71,7 +86,12 @@ class FightingAgent(Agent):
         self.model.grid.move_agent(self, new_position)
 
     def attack(self, cells_with_agents) -> None:
+        """Handles the attack of the agent. 
+        Gets the list of cells with the agents the agent can attack.
 
+        Args:
+            cells_with_agents (list[FightingAgent]): The list of other agents nearby.
+        """
         agentToAttack = self.random.choice(cells_with_agents)
         agentToAttack.health -= self.attack_damage
         agentToAttack.attacked = True
@@ -80,7 +100,10 @@ class FightingAgent(Agent):
         print("I attacked!")
 
     def move(self) -> None:
-        """Handles the movement behavior. Here the agent decides if it moves or attacks other agent."""
+        """Handles the movement behavior.
+        Here the agent decides if it moves,
+        drinks the heal potion,
+        or attacks other agent."""
 
         should_take_potion = self.random.randint(0, 100)
         if should_take_potion == 1:

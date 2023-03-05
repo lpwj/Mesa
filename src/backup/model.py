@@ -64,5 +64,3 @@ class FightingModel(Model):
             (Integer): Number of Agents.
         """
         return sum([1 for agent in model.schedule.agents if agent.health == 0])
-
-   
