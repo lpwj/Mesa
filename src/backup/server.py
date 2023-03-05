@@ -4,9 +4,9 @@ from mesa.visualization.UserParam import NumberInput
 from model import MoneyModel
 from mesa.visualization.modules import CanvasGrid, ChartModule
 
-NUMBER_OF_CELLS = 30
-SIZE_OF_CANVAS_IN_PIXELS_X = 900
-SIZE_OF_CANVAS_IN_PIXELS_Y = 900
+NUMBER_OF_CELLS = 20
+SIZE_OF_CANVAS_IN_PIXELS_X = 1400
+SIZE_OF_CANVAS_IN_PIXELS_Y = 1100
 
 simulation_params = {
     "number_agents": NumberInput(
