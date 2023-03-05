@@ -3,7 +3,9 @@ import math
 
 ATTACK_DAMAGE = 50
 INITIAL_HEALTH = 100
-HEALING_POTION = 20
+HEALING_POTION = 2
+
+STRATEGY = 1
 
 
 def set_agent_type_settings(agent, type):
@@ -58,10 +60,23 @@ class MoneyAgent(Agent):
 
         self.move()
 
-    def attackOrMove(self, cells_with_agents) -> None:
+    def attackOrMove(self, cells_with_agents, possible_steps) -> None:
+
+        should_attack = self.random.randint(0, 1)
+        if should_attack:
+            self.attack(cells_with_agents)
+            return
+
+        print("I chose to not attack!")
+        new_position = self.random.choice(possible_steps)
+        self.model.grid.move_agent(self, new_position)
+
+    def attack(self, cells_with_agents) -> None:
+
         agentToAttack = self.random.choice(cells_with_agents)
         agentToAttack.health -= ATTACK_DAMAGE
         agentToAttack.attacked = True
+        print("I attacked!")
 
     def move(self) -> None:
         possible_steps = self.model.grid.get_neighborhood(
@@ -79,7 +94,10 @@ class MoneyAgent(Agent):
 
         # if there is some agent on the
         if len(cells_with_agents):
-            self.attackOrMove(cells_with_agents)
+            if STRATEGY == 1:
+                self.attackOrMove(cells_with_agents, possible_steps)
+            else:
+                self.attack(cells_with_agents)
         else:
             new_position = self.random.choice(possible_steps)
             self.model.grid.move_agent(self, new_position)
